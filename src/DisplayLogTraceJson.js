@@ -22,13 +22,12 @@ export default function DisplayLogTraceJson(prop){
     const [isShown, setIsShown] = useState(false);
     const [filteredResults, setFilteredResults] = useState([]);
     const [searchInput, setSearchInput] = useState('');
-    const [state, setState] = useState([
-        {
+    const [message, setMessage] = useState();
+    const [state, setState] = useState([{
           startDate: new Date(),
           endDate: addDays(new Date(), 0),
           key: 'selection'
-        }
-      ]);
+        }]);
     const handleClick = () => {
         setIsShown(!isShown);
     };
@@ -40,12 +39,12 @@ export default function DisplayLogTraceJson(prop){
             console.error(err);
           });
     }
-    const len=list.length
     const data = list
     useEffect(()=>{
         axios.get("http://localhost:9000/logsAPI/").then((response)=>{setList(response.data)},
         setLoading(false))
     },[])
+    const len=list.length
     if(loading){
         return(
             <div>Loading ......</div>
@@ -75,10 +74,11 @@ export default function DisplayLogTraceJson(prop){
         <td>{item.Direction}</td>
         <td>{item.FromServer}</td>
         <td>{item.ToServer}</td>
+        <td >{item.undefined}</td>
         </tr>
     ))
     const table_data = list.map((item,i)=>(
-        <tr key={i}>
+        <tr key={i} onClick={()=>{setMessage(item.undefined)}}>
         <td>{i+1}</td>
         <td>{item.EventTimestamp}</td>
         <td>{item.FullQualifiedName}</td>
@@ -89,6 +89,7 @@ export default function DisplayLogTraceJson(prop){
         <td>{item.Direction}</td>
         <td>{item.FromServer}</td>
         <td>{item.ToServer}</td>
+        <td>{item.undefined}</td>
         </tr>
     ))
     const handleDate=(e)=>{
@@ -175,7 +176,8 @@ export default function DisplayLogTraceJson(prop){
                             <th>CorrelationIDContent</th>
                             <th>Direction</th>
                             <th>FromServer</th>
-                            <th>ToServer</th>  
+                            <th>ToServer</th> 
+                            <th>LogMessage</th> 
                             </tr>
                         </thead>
                         <tbody>{searchInput.length > 1 ? searched_data : table_data }</tbody>
@@ -186,7 +188,8 @@ export default function DisplayLogTraceJson(prop){
                 <UI length={len} data={data} searchItems={searchItems} searchInput={searchInput}/>
                 <div className="message-details">
                     <header>Message Details</header>
-                    <input type="text" placeholder="Please select a service to see a log message details"/>
+                    {/* <input type="text" placeholder="Please select a service to see a log message details" value={message}/> */}
+                    <p>{message}</p>
                 </div>
             </div>
         </div>
